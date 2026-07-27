@@ -19,24 +19,31 @@ const SideBar = () => {
     useEffect(() => {
         const getConv = async () => {
             const data = await getConversation()
-            dispatch(setConversation(data||[]))
+            dispatch(setConversation(data || []))
         }
         getConv()
-    }, [])
+    }, [userData])
 
     const handelCreateConversation = async (params) => {
         const data = await createConversation()
         dispatch(addConversation(data))
     }
 
-     if(collapsed){
-        return(
+
+    const handleLogout = async () => {
+    await logOut()
+    dispatch(setUserData(null))
+    dispatch(setConversation([]))       // agar conversations bhi user-specific hain
+}
+
+    if (collapsed) {
+        return (
             <div className='hidden lg:flex flex-col items-center w-[56px] h-screen bg-[#0d0f14] border-r border-white/[0.06] py-4 gap-1 shrink-0 '>
-             <button 
-             onClick={()=>setCollapsed(false)}
-             className='flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 hover:text-slate-200 hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer mb-1'>
-               <PanelRight/>
-             </button>
+                <button
+                    onClick={() => setCollapsed(false)}
+                    className='flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 hover:text-slate-200 hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer mb-1'>
+                    <PanelRight />
+                </button>
             </div>
         )
     }
@@ -143,28 +150,26 @@ const SideBar = () => {
 
                                             :
                                             <div className='w-9 h-9 rounded-full object-cover border-2 border-indigo-500/25 '>
-                                                <User size={15} className='text-slate-400'/>
+                                                <User size={15} className='text-slate-400' />
                                             </div>
 
                                     }
                                 </div>
-                                  
-                                  <div className='flex-1 min-w-0'>
+
+                                <div className='flex-1 min-w-0'>
                                     <p className='text-[13.5px] font-semibold text-slate-100 truncate '>{userData?.name || "user"}</p>
                                     <p className='text-[11px] text-slate-600 mt-px '>{"Free Plan"}</p>
-                                  </div>
-                                  <div className='flex gap-1'>
+                                </div>
+                                <div className='flex gap-1'>
                                     <button className='flex items justify-center w-7 rounded-[7px] border-none bg-transparent text-yellow-600 cursor-pointer hover:bg-white/[0.08] hover:text-slate-400 transition-all duration-150 '>
-                                        <Coins size={16}/>
+                                        <Coins size={16} />
                                     </button>
                                     <button
-                                    onClick={()=>{
-                                        dispatch(setUserData(null))
-                                    }}
-                                    className='flex items justify-center w-7 rounded-[7px] border-none bg-transparent text-Slate-600 cursor-pointer hover:bg-white/[0.08] hover:text-slate-400 transition-all duration-150 '>
-                                        <LogOut size={16}/>
+                                        onClick={handleLogout}
+                                        className='flex items justify-center w-7 rounded-[7px] border-none bg-transparent text-Slate-600 cursor-pointer hover:bg-white/[0.08] hover:text-slate-400 transition-all duration-150 '>
+                                        <LogOut size={16} />
                                     </button>
-                                  </div>
+                                </div>
 
                             </div>
                             :
@@ -180,7 +185,7 @@ const SideBar = () => {
         </div>
     )
 
-   
+
 }
 
 export default SideBar
