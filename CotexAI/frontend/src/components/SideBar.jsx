@@ -31,10 +31,10 @@ const SideBar = () => {
 
 
     const handleLogout = async () => {
-    await logOut()
-    dispatch(setUserData(null))
-    dispatch(setConversation([]))       // agar conversations bhi user-specific hain
-}
+        await logOut()
+        dispatch(setUserData(null))
+        dispatch(setConversation([]))       // agar conversations bhi user-specific hain
+    }
 
     if (collapsed) {
         return (
@@ -44,6 +44,57 @@ const SideBar = () => {
                     className='flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 hover:text-slate-200 hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer mb-1'>
                     <PanelRight />
                 </button>
+
+                <button
+                    onClick={handelCreateConversation}
+                    className='flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 hover:text-slate-200 hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer'>
+                    <Plus size={17} />
+                </button>
+                <div
+                    className='flex-1 overflow-y-auto pt-5 px-2.5 pb-2 [scrollbar-width:none] [&:: -webkit-scrollbar]:hidden '>
+
+                    {
+                        conversation.map((conv, i) => {
+                            const isActive = selectedConversation?._id === conv?._id
+                            return (
+                                <div
+                                    key={conv?._id || i}
+                                    onClick={() => dispatch(setselectedConversation(conv))}
+                                    className={`flex items-center gap-2.5 cursor-pointer mb-0.5 px-3 py-2.5 rounded-[10px] border transition-colors duration-150 ${isActive ? "bg-indigo-500/10 border-indigo-500/[0.18] " : "bg-white/[0.05] border-transparent"} `}>
+
+                                    <div
+                                        className={`flex items-center justify-center shrink-0 w-[20px] h-[20px] h-[28px] rounded-lg transition-colors duration-150
+                        ${isActive ? "bg-indigo-150/15 text-indigo-400" : "bg-white/[0.05] text-slate-500 "} `}
+                                    >
+                                        <MessageSquare size={13} />
+                                    </div>
+
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+
+                <div className='relative shrink-0'>
+                    {
+                        (userData?.avatar && !imageError) ?
+                            <img
+                                referrerPolicy="no-referrer"
+                                crossOrigin="anonymous"
+                                className='w-9 h-9 rounded-[10px] object-cover border-2 border-indigo-500/25 '
+                                src={userData?.avatar}
+                                alt={"image"}
+                                onError={() => setImageError(true)} />
+
+
+                            :
+                            <div className='w-9 h-9 rounded-full object-cover border-2 border-indigo-500/25 '>
+                                <User size={15} className='text-slate-400' />
+                            </div>
+
+                    }
+                </div>
+
             </div>
         )
     }

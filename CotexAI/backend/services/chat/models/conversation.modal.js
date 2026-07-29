@@ -10,7 +10,7 @@ const conversationSchema =new mongoose.Schema({
         type:String
     }
 
-},{timeStamps:true})
+}, { timestamps: true }) 
 
 const Conversation= mongoose.model("Conversation",conversationSchema)
 export default Conversation
