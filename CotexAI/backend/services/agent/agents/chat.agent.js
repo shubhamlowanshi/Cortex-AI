@@ -1,5 +1,6 @@
-import { AIMessage, HumanMessage } from "@langchain/core/messages"
+import { AIMessage, HumanMessage, SystemMessage } from "@langchain/core/messages"
 import { getModel } from "../config/llmModels.js"
+import { getMemory } from "../config/memory.js"
 
 
 export const chatAgent = async (state) => {
@@ -26,7 +27,7 @@ export const chatAgent = async (state) => {
 
     `
     const messages = [
-        new SysytemMessage(systemPrompt)
+        new SystemMessage(systemPrompt)
     ]
 
     history.forEach(msg => {
