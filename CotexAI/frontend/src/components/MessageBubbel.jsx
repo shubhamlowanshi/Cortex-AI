@@ -12,6 +12,7 @@ const MessageBubbel = ({ role, content }) => {
         :
         "bg-white/[0.04] border border-white/[0.07] text-slate-200 rounded-tl-sm "
         } `}>
+        
         <MarkDown>
           {content}
           </MarkDown>
