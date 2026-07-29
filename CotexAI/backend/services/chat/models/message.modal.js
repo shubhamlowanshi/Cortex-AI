@@ -1,5 +1,15 @@
 import mongoose from "mongoose"
 
+
+const artifactSchema  = new mongoose.Schema({
+    id : Number,
+    type:String,
+    title:String,
+    // files:[fileSchema],
+
+},
+{_id:false})
+
 const messageSchema = new mongoose.Schema({
 
     conversationId: {

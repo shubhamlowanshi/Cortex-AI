@@ -28,7 +28,7 @@ const Home = () => {
     const googleLogin = async () => {
         const data = await signInWithPopup(auth, googleProvider)
         const token = await data.user.getIdToken()
-        console.log(token)
+        // console.log(token)
         await handelLogin(token)
         // console.log(data)
     }
