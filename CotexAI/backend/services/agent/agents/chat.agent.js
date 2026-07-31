@@ -7,8 +7,24 @@ export const chatAgent = async (state) => {
     const llm = await getModel("chat")
 
     const history = await getMemory(state.conversationId)
+    const searchContext = state.searchResults?.results?.length
+        ? `
+Web search results:
+${state.searchResults.results
+            .slice(0, 5)
+            .map((r, i) => `${i + 1}. ${r.title}\n${r.content?.slice(0, 500)}`)
+            .join('\n\n')}
+
+Answer the user using only the above search results.`
+        : ''
 
     const systemPrompt = `You are CortexAI,  an intelligent AI assistant.
+
+    ${searchContext}
+    if searchContext exists:
+    
+    -Use search results to answer.
+    -Do not mention internal tools.
 
     rules:
     -for simple questions, greetings, and short queries, respond naturally in plain text.
@@ -30,7 +46,7 @@ export const chatAgent = async (state) => {
         new SystemMessage(systemPrompt)
     ]
 
-    history.forEach(msg => {
+    history.slice(-10).forEach(msg => {
         if (msg.role == 'user') {
             messages.push(new HumanMessage(msg.content))
         }

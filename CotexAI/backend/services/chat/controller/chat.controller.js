@@ -53,6 +53,21 @@ export const updatedConversation = async (req, res) => {
     }
 }
 
+export const saveMessage = async (req, res) => {
+    try {
+        const { conversationId, role, content,images } = req.body
+        const message = await Message.create({
+            conversationId,
+            content,
+            role,
+            images
+        })
+        return res.status(200).json(message)
+    }
+    catch (error) {
+        return res.status(500).json({message:`save conversation error ${error}`})
+    }
+}
 
 
 export const getMessage = async (req, res) => {
@@ -70,20 +85,6 @@ export const getMessage = async (req, res) => {
 
 
 
-export const saveMessage = async (req, res) => {
-    try {
-        const { conversationId, role, content } = req.body
-        const message = await Message.create({
-            conversationId,
-            role,
-            content
-        })
-        return res.status(200).json(message)
-    }
-    catch (error) {
-        return res.status(500).json({message:`save conversation error ${error}`})
-    }
-}
 
 
 

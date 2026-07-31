@@ -26,7 +26,7 @@ workflow.addConditionalEdges("router",(state)=>{
         return "chat";
 
         case "search":
-        return "serach";
+        return "search";
 
         case "coding":
         return "coding";
