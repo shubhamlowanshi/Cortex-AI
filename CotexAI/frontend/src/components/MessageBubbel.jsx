@@ -1,8 +1,8 @@
 import { ChartLine, Check, Copy, ExternalLink, X } from "lucide-react";
-import React, { Children, useState } from "react";
+import React, { useState } from "react";
 import MarkDown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import {Prism as SyntaxHighlighter} from "react-syntax-highlighter";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const MessageBubbel = ({ role, content, images }) => {
@@ -17,6 +17,7 @@ const MessageBubbel = ({ role, content, images }) => {
       setCopiedCode("");
     }, 2000);
   };
+
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div
@@ -48,18 +49,39 @@ const MessageBubbel = ({ role, content, images }) => {
         <MarkDown
           remarkPlugins={[remarkGfm]}
           components={{
-            h1: ({ Children }) => (
-              <h1 className="text-2xl font-bold mt-5 mb-3 ">{Children}</h1>
+            h1: ({ children }) => (
+              <h1 className="text-2xl font-bold mt-5 mb-3 ">{children}</h1>
             ),
-            h2: ({ Children }) => (
-              <h2 className="text-xl font-bold mt-4 mb-2 ">{Children}</h2>
+            h2: ({ children }) => (
+              <h2 className="text-xl font-bold mt-4 mb-2 ">{children}</h2>
             ),
-            h3: ({ Children }) => (
-              <h3 className="text-lg font-bold mt-3 mb-2 ">{Children}</h3>
+            h3: ({ children }) => (
+              <h3 className="text-lg font-bold mt-3 mb-2 ">{children}</h3>
             ),
-            p: ({ children }) => (
-              <p className="mb-3 whitespace-pre-wrap break-words">{children}</p>
-            ),
+            p: ({ node, children }) => {
+              // If this paragraph contains a block-level code element
+              // (fenced code block), render a div instead of a p to
+              // avoid invalid <pre> inside <p> nesting.
+              const hasBlockChild = node?.children?.some(
+                (child) =>
+                  child.tagName === "pre" ||
+                  (child.tagName === "code" && child.properties?.className)
+              );
+
+              if (hasBlockChild) {
+                return (
+                  <div className="mb-3 whitespace-pre-wrap break-words">
+                    {children}
+                  </div>
+                );
+              }
+
+              return (
+                <p className="mb-3 whitespace-pre-wrap break-words">
+                  {children}
+                </p>
+              );
+            },
             ul: ({ children }) => (
               <ul className="list-disc pl-5 space-y-1 my-2">{children}</ul>
             ),
@@ -67,7 +89,7 @@ const MessageBubbel = ({ role, content, images }) => {
               <ol className="list-decimal pl-5 space-y-1 my-2">{children}</ol>
             ),
             table: ({ children }) => (
-              <div className="overrflow-x-auto my-4">
+              <div className="overflow-x-auto my-4">
                 <table className="min-w-full border border-white/10">
                   {children}
                 </table>
@@ -86,60 +108,63 @@ const MessageBubbel = ({ role, content, images }) => {
                 href={href}
                 target="_blank"
                 rel="noreferrer"
-                className="text-indigo-400 underline inline-flex item-center gap-1"
+                className="text-indigo-400 underline inline-flex items-center gap-1"
               >
-                {children} <ExternalLink size={14} />{" "}
+                {children} <ExternalLink size={14} />
               </a>
             ),
             code: ({ className, children }) => {
               const value = String(children).trim();
 
+              // Fenced code blocks get a className like "language-js".
+              // Inline code has no className at all.
               if (className) {
+                const language = className.replace("language-", "");
                 return (
-                  <code className=" px-1 py-0.5 rounded bg-white/10 text-indigo-200">
-                    {value}
-                  </code>
+                  <div className="my-4 overflow-hidden rounded-xl border border-white/10 bg-[#111318]">
+                    <div className="flex items-center justify-between bg-[#1b1d24] border-2 bg-white/10 px-4 py-2">
+                      <span className="uppercase text-xs text-slate-400">
+                        {language}
+                      </span>
+                      <button
+                        className="flex items-center gap-1 text-xs "
+                        onClick={() => copyCode(value)}
+                      >
+                        {copiedCode === value ? (
+                          <>
+                            <Check size={14} /> Copied
+                          </>
+                        ) : (
+                          <>
+                            <Copy size={14} /> Copy
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <SyntaxHighlighter
+                      language={language}
+                      style={oneDark}
+                      wrapLines
+                      showLineNumbers
+                      customStyle={{
+                        margin: 0,
+                        padding: "16px",
+                        background: "#0d1117",
+                        fontSize: "13px",
+                      }}
+                    >
+                      {value}
+                    </SyntaxHighlighter>
+                  </div>
                 );
               }
-              const language = className?.replace("language-", "");
-              return (
-                <div className="my-4 overflow-hidden rounded-xl border border-white/10 bg-[#111318]">
-                  <div className="flex item-center justify-between bg-[#1b1d24] border-2 bg-white/10 px-4 py-2">
-                    <span className="uppercase text-xs text-slate-400">
-                      {language}
-                    </span>
-                    <button
-                      className="flex item-center gap-1 text-xs "
-                      onClick={() => copyCode(value)}
-                    >
-                      {copiedCode == value ? (
-                        <>
-                          <Check size={14} /> Copied
-                        </>
-                      ) : (
-                        <>
-                          {" "}
-                          <Copy size={14} /> Copy
-                        </>
-                      )}
-                    </button>
-                  </div>
 
-                  <SyntaxHighlighter
-                    language={language}
-                    style={oneDark}
-                    wrapLines
-                    showLineNumbers
-                    customStyle={{
-                      margin: 0,
-                      padding: "16px",
-                      background: "#0d1117",
-                      fontSize: "13px",
-                    }}
-                  >
-                    {value}
-                  </SyntaxHighlighter>
-                </div>
+              // Inline code
+              return (
+                <code className="px-1 py-0.5 rounded bg-white/10 text-indigo-200">
+                  {value}
+                </code>
               );
             },
           }}

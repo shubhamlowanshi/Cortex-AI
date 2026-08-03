@@ -4,8 +4,9 @@ import sendMessage from '../features/sendMessage'
 import { useSelector } from 'react-redux'
 import { addMessages } from '../redux/messageSlice'
 import { useDispatch } from 'react-redux'
-import { createConversation } from '../features/createConversation'
-import { addConversation, setConvTitle, setselectedConversation } from '../redux/conversationSlice'
+import { createConversation}  from '../features/createConversation'
+import { addConversation, setConvTitle, setselectedConversation, } from '../redux/conversationSlice'
+import { setArtifacts } from '../redux/messageSlice'
 import { updateConversation } from '../features/updateConversation'
 const ChatInput = () => {
 
@@ -39,6 +40,7 @@ const ChatInput = () => {
 
     try {
         const data = await sendMessage(payload)
+        dispatch(setArtifacts(data?.artifacts || []))
         dispatch(addMessages({ role: "assistant", content:data.answer, images:data.images }))
         console.log(data)
     } catch (err) {
@@ -99,6 +101,7 @@ const ChatInput = () => {
                             const Icon = agent.icon
                             return (
                                 <div 
+                                key={agent.id}
                                 onClick={()=>setSelectedAgent(agent.label)}
                                 className={`flex-shrink-0 cursor-pointer inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium border  transition-all
                             ${isActive
@@ -134,10 +137,10 @@ const ChatInput = () => {
                 />
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-1'>
-                        <button className='flex items-center justify-center w-8 h-8 rouded-lg text-slate-600 hover:text-slate-400 hover:bg-white/[0.05] border border-transparent hover:border-white/[0.06] transition-all duration-150 bg-transparent cursor-pointer'>
+                        <button className='flex items-center justify-center w-8 h-8 rounded-lg text-slate-600 hover:text-slate-400 hover:bg-white/[0.05] border border-transparent hover:border-white/[0.06] transition-all duration-150 bg-transparent cursor-pointer'>
                             <Paperclip size={16} />
                         </button>
-                        <button className='flex items-center justify-center w-8 h-8 rouded-lg text-slate-600 hover:text-slate-400 hover:bg-white/[0.05] border border-transparent hover:border-white/[0.06] transition-all duration-150 bg-transparent cursor-pointer'>
+                        <button className='flex items-center justify-center w-8 h-8 rounded-lg text-slate-600 hover:text-slate-400 hover:bg-white/[0.05] border border-transparent hover:border-white/[0.06] transition-all duration-150 bg-transparent cursor-pointer'>
                             <Mic size={16} />
                         </button>
                     </div>

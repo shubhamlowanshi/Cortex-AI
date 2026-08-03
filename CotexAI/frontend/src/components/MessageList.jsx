@@ -13,7 +13,7 @@ const MessageList = () => {
                     <div className='flex flex-col gap-1.5'>
                         <h1 className='text-[20px] font-semibold text-slate-200 tracking-tight '>CortexAI</h1>
                         <p className='text-[15px] font-semibold text-slate-400 tracking-tight '>How can I help you?</p>
-                        <p className='text-[13px] font-semibold text-slate-600 max-w-[260px] leaading-relaxed '>Ask me anthing - code, ideas , explaination, or just a quick question.</p>
+                        <p className='text-[13px] font-semibold text-slate-600 max-w-[260px] leading-relaxed '>Ask me anthing - code, ideas , explaination, or just a quick question.</p>
                     </div>
                     <div className='flex flex-wrap justify-center gap-2 mt-1'>
                         {
