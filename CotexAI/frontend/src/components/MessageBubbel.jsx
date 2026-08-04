@@ -65,7 +65,7 @@ const MessageBubbel = ({ role, content, images }) => {
               const hasBlockChild = node?.children?.some(
                 (child) =>
                   child.tagName === "pre" ||
-                  (child.tagName === "code" && child.properties?.className)
+                  (child.tagName === "code" && child.properties?.className),
               );
 
               if (hasBlockChild) {
@@ -165,6 +165,19 @@ const MessageBubbel = ({ role, content, images }) => {
                 <code className="px-1 py-0.5 rounded bg-white/10 text-indigo-200">
                   {value}
                 </code>
+              );
+            },
+
+            img: ({ src }) => {
+              if (!src) return null;
+              return (
+                <img
+                  onClick={() => setLightBox(src)}
+                  src={src}
+                  loading="lazy"
+                  onError={(e) => e.currentTarget.remove()}
+                  className="w-40 h-28 rounded-xl object-cover border border-white/10 cursor-zoom-in hover:opacity-90 transition"
+                />
               );
             },
           }}
