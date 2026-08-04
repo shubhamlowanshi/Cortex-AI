@@ -55,7 +55,7 @@ export const codingAgent = async (state) => {
             schema:
 
             {
-            "files:[
+            "files":[
             {
             "name":"index.html",
             "content":""
@@ -86,25 +86,47 @@ export const codingAgent = async (state) => {
 
             `
 
-            const res=await llm.invoke(prompt)
-           const data=JSON.parse(res.content)
-           return{
+        function safeJsonParse(raw) {
+            const cleaned = raw
+                .trim()
+                .replace(/^```(?:json)?\s*/i, '')  // strip opening ```json or ```
+                .replace(/```\s*$/i, '')            // strip closing ```
+                .trim()
+
+            return JSON.parse(cleaned)
+        }
+        
+        const res = await llm.invoke(prompt)
+
+        let data
+        try {
+            data = safeJsonParse(res.content)
+        } catch (err) {
+            console.error("Failed to parse coding agent JSON:", res.content)
+            return {
+                ...state,
+                aiResponse: "Sorry, I couldn't generate the project correctly. Please try again.",
+                artifacts: []
+            }
+        }
+
+        return {
             ...state,
-            aiResponse:"code genrated successfully",
-            artifacts:[
+            aiResponse: "code generated successfully",
+            artifacts: [
                 {
-                    id:Date.now(),
-                    type:"project",
-                    files:data.files ||[],
-                    title:state.prompt
+                    id: Date.now(),
+                    type: "project",
+                    files: data.files || [],
+                    title: state.prompt
                 }
             ]
-           }
+        }
 
 
     }
 
-    const res=await llm.invoke(
+    const res = await llm.invoke(
         `
         The user's request is:
 
@@ -125,11 +147,13 @@ export const codingAgent = async (state) => {
         `
     )
 
-    const data=res.content
-    return{
+    const data = res.content
+    return {
         ...state,
-        aiResponse:data,
-        artifacts:[]
+        aiResponse: data,
+        artifacts: []
     }
 
 }
+
+
