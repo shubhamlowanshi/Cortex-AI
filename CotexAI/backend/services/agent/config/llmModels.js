@@ -34,6 +34,7 @@ export const getModel = async (agent) => {
             return groq;
         case "coding":
             return openRouter;
+            
         default:
             return groq;
     }

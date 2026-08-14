@@ -4,11 +4,9 @@ import {uploadToS3} from "../utils/uploadsToS3.js"
 import {getFromS3} from "../utils/getFromS3.js"
 
 export const visionAgent = async (state) => {
-
-       try {
-              
-              const llm = await getModel("image");
-  const res = await llm.invoke(`
+  try {
+    const llm = await getModel("image");
+    const res = await llm.invoke(`
         You are an elite AI image prompt engineer.
 Convert the user request into a highly detailed image generation prompt.
 
@@ -28,34 +26,32 @@ Requirements:
  Return only image prompt.
  User Request:
  ${state.prompt}
-        `)
+        `);
 
- const prompt = res.content.trim()
+    const prompt = res.content.trim();
 
- const imageUrl= `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`
- const imageRes = await axios.get(imageUrl,{responseType:"arraybuffer"})
- const buffer = Buffer.from(imageRes.data)
- const filename = `image-${Date.now()}.png`
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
+    const imageRes = await axios.get(imageUrl, { responseType:"arraybuffer" ,timeout:30000});
+    const buffer = Buffer.from(imageRes.data);
+    const filename = `image-${Date.now()}.png`;
 
- await uploadToS3(filename,buffer,"image/png")
- const dowanloadurl = await getFromS3(filename,24*60*60)
+    await uploadToS3(filename, buffer, "image/png");
 
- return {
-       ...state,
-       aiResponse:`
-      
-       ![Genearated Image] (${downloadUrl})
-       📤[Genearated Image] (${downloadUrl})
-       ⌛Link expires in 10 minutes.
+    const expirySeconds = 10 * 60; // 10 minutes, matches the message below
+    const downloadUrl = await getFromS3(filename, expirySeconds);
 
-       `
- }
-       } catch (error) {
-              return {
-       ...state,
-       aiResponse:"❌ Failed to genarate image"
-       
- }
-       }
-  
+    return {
+      ...state,
+      aiResponse: `
+![Generated Image](${downloadUrl})
+📤 [Generated Image](${downloadUrl})
+⌛ Link expires in 10 minutes.
+`
+    };
+  } catch (error) {
+    return {
+      ...state,
+      aiResponse: "❌ Failed to generate image"
+    };
+  }
 };

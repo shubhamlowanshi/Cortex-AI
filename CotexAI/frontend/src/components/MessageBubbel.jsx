@@ -180,6 +180,8 @@ const MessageBubbel = ({ role, content, images }) => {
                 />
               );
             },
+            
+
           }}
         >
           {content}
