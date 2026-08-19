@@ -23,6 +23,7 @@ import {
 import { createConversation } from "../features/createConversation";
 import { setUserData } from "../redux/userSlice";
 import logOut from "../features/logOut";
+import BillingDrawer from "./BillingDrawer.jsx";
 const SideBar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const dispatch = useDispatch();
@@ -31,6 +32,7 @@ const SideBar = () => {
   );
   const { userData } = useSelector((state) => state.user);
   const [imageError, setImageError] = useState(false);
+  const [showBilling, setShowBilling] = useState(false);
 
   useEffect(() => {
     const getConv = async () => {
@@ -209,7 +211,10 @@ const SideBar = () => {
                   </p>
                 </div>
                 <div className="flex gap-1">
-                  <button className="flex items justify-center w-7 rounded-[7px] border-none bg-transparent text-yellow-600 cursor-pointer hover:bg-white/[0.08] hover:text-slate-400 transition-all duration-150 ">
+                  <button
+                    onClick={() => setShowBilling(true)}
+                    className="flex items justify-center w-7 rounded-[7px] border-none bg-transparent text-yellow-600 cursor-pointer hover:bg-white/[0.08] hover:text-slate-400 transition-all duration-150 "
+                  >
                     <Coins size={16} />
                   </button>
                   <button
@@ -226,6 +231,11 @@ const SideBar = () => {
           </div>
         </div>
       </div>
+
+      <BillingDrawer
+        open={showBilling}
+        onClose={() => setShowBilling(false)}
+      ></BillingDrawer>
     </div>
   );
 };
