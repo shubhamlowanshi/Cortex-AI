@@ -1,16 +1,17 @@
+import axios from "axios";
 import { PLANS } from "../config/plan.js";
 import razorpay from "../config/rozorpay.js";
 import Payment from "../models/payment.model.js";
-import crypto from "crypto"
+import crypto from "crypto";
 
-export const createOrder = async (req,res) => {
+export const createOrder = async (req, res) => {
   try {
     const { plan } = req.body;
     const userId = req.headers["x-user-id"];
     const selectedPlan = PLANS[plan];
 
     if (!selectedPlan) {
-      return res.status({ message: "Plan not found" });
+      return res.status(400).json({ message: "Plan not found" });
     }
 
     const order = await razorpay.orders.create({
@@ -35,7 +36,7 @@ export const createOrder = async (req,res) => {
   }
 };
 
-export const verifyPayment = async (req,res) => {
+export const verifyPayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       req.body;
@@ -44,25 +45,34 @@ export const verifyPayment = async (req,res) => {
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest("hex");
-      if (generateSignature !== razorpay_signature){
-        return res.status(400).json({message:"Payment verification Failed"})
 
-      }
-      const payment = await Payment.findOne({orderId:razorpay_order_id})
-
-      if (!payment){
-        return res.status(404).json ({message:"Payment Not found"})
-        
+    if (generateSignature !== razorpay_signature) {
+      return res.status(400).json({ message: "Payment verification Failed" });
     }
 
-    payment.status = "paid"
-    payment.paymentId = razorpay_payment_id
-    await payment.save()
-    await axios.post(`${process.env.AUTH_SERVICE}/update-plan`,{userId:payment.userId,plan:payment.plan,credits:payment.credits})
+    const payment = await Payment.findOne({ orderId: razorpay_order_id });
 
-    return res.status(200).json({message:"Payment Verified"})
+    if (!payment) {
+      return res.status(404).json({ message: "Payment Not found" });
+    }
+
+    payment.status = "paid";
+    payment.paymentId = razorpay_payment_id;
+    await payment.save();
+
+    // ✅ NAYA: sessionId nikal ke auth service ko bhejo
+    const sessionId = req.cookies?.session;
+
+    await axios.post(`${process.env.AUTH_SERVICE}/update-plan`, {
+      userId: payment.userId,
+      plan: payment.plan,
+      credits: payment.credits,
+      sessionId,   // ✅ ye naya field
+    });
+
+    return res.status(200).json({ message: "Payment Verified" });
   } catch (error) {
-        return res.status(500).json({ message: `verify payment error ${error}` });
-
+    console.error("VERIFY PAYMENT ERROR:", error);
+    return res.status(500).json({ message: `verify payment error ${error}` });
   }
 };

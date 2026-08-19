@@ -125,8 +125,8 @@ const SideBar = () => {
           <span className="text-[16px] font-semibold text-slate-100 tracking-tight flex-1 ">
             CortexAI
           </span>
-          <span className="text-[10px] font-medium text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full tracking-wide  ">
-            Free
+          <span className="text-[10px] font-medium text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full tracking-wide">
+            {userData?.plan || "Free"}
           </span>
           <button
             onClick={() => dispatch(setselectedConversation(null))}
@@ -206,8 +206,8 @@ const SideBar = () => {
                   <p className="text-[13.5px] font-semibold text-slate-100 truncate ">
                     {userData?.name || "user"}
                   </p>
-                  <p className="text-[11px] text-slate-600 mt-px ">
-                    {"Free Plan"}
+                  <p className="text-[11px] text-slate-600 mt-px">
+                    {userData?.plan ? `${userData.plan} Plan` : "Free Plan"}
                   </p>
                 </div>
                 <div className="flex gap-1">

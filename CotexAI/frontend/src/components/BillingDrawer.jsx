@@ -1,10 +1,13 @@
 import React from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Crown, X } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useSelector ,useDispatch} from "react-redux";
+import getCurrentUser from "../features/getCurrentUser"; 
 import { createOrder } from "../features/createOrder";
 import { verifyPayment } from "../features/verifyPayment";
+import { setUserData } from "../redux/userSlice"; 
 function BillingDrawer({ open, onClose }) {
+   const dispatch = useDispatch();     
   const { userData } = useSelector((state) => state.user);
 
   const handleUpgrade = async (plan) => {
@@ -18,9 +21,13 @@ function BillingDrawer({ open, onClose }) {
         description: `${data?.plan?.name}Plan`,
         order_id: data?.order?.id,
         handler: async (response) => {
-          try {
-            const data = await verifyPayment(response);
-            console.log(data);
+         try {
+            await verifyPayment(response);
+            const updatedUser = await getCurrentUser();    
+            if (updatedUser) {
+              dispatch(setUserData(updatedUser));            
+            }
+            onClose();                                       
           } catch (error) {
             console.log(error);
           }

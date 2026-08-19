@@ -9,7 +9,7 @@ export const pptAgent = async (state) => {
         const prompt = `You are a professional presentation designer.
 
         Return ONLY valid JSON. No markdown. No code block. No explanation.
-
+        "theme":"midnight | sunset | forest | royal | coral | ocean (pick the best fit for the topic mood)"
         Format:
         {
         "title":"",
